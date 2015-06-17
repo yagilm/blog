@@ -1,5 +1,7 @@
 class ArticlesController < ApplicationController
 
+  http_basic_authenticate_with name: "test", password: "lalala", except: [:index, :show]
+
   def index
     @articles = Article.all
   end
@@ -14,13 +16,15 @@ class ArticlesController < ApplicationController
     @article = Article.new
   end
 
+  def edit
+    @article = Article.find(params[:id])
+  end
+
+
   def create
     # Removing the next line as the article_params method is made so it can be reused by multiple actions
     #@article = Article.new(params.require(:article).permit(:title, :text))
-
-    # To display the fields in the web browser
-    # render plain: params[:article].inspect
-
+    # To display the fields in the web browser: # render plain: params[:article].inspect
     # Initializing the Article model with the respective atributes //  params containes the attributes
 #    @article = Article.new(params[:article])
 #              ^ class names _must_ beggin with capital letter
@@ -34,6 +38,23 @@ class ArticlesController < ApplicationController
       render 'new'
     end
   end
+
+  def update
+  @article = Article.find(params[:id])
+
+  if @article.update(article_params)
+    redirect_to @article
+  else
+    render 'edit'
+  end
+end
+
+def destroy
+  @article = Article.find(params[:id])
+  @article.destroy
+
+  redirect_to articles_path
+end
 
 # both allow(permit) and require(require) the title and text parameters for valid use of create.
 private
